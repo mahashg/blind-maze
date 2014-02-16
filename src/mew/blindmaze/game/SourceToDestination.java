@@ -185,8 +185,9 @@ public class SourceToDestination {
 	public static void main(String[] args) {
 		char choice;
 		
+		read_configuration();
 		// Initialize the Game with all the entities		
-		init_board();	
+		init_board();
 		init(); // initialize it with 1 Start, 1 End & 10 Walls on 10X10 board		
 		say_welcome();
 		
@@ -251,6 +252,12 @@ public class SourceToDestination {
 			}while(!valid);
 					
 		}
+	}
+
+	private static void read_configuration() {
+		//TODO: Read Configuration from external file
+		wall_count = 100;
+		board_size = 25;		
 	}
 
 	private static void abort() {
