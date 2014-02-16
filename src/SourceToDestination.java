@@ -273,6 +273,10 @@ public class SourceToDestination {
 				case 'D': case 'd':
 					valid = move(current_point.x, current_point.y-1);
 					break;
+				
+				case '#' :
+					print_status();
+					break;
 					
 				default:
 					if(debug_on) System.out.println("no option matched.");
@@ -290,11 +294,13 @@ public class SourceToDestination {
 	}
 
 	private static void say_welcome() {
+		System.out.println("****************************************************************************");
 		System.out.println("Welcome to Unknown World Hunting Game !!!");
 		System.out.println("The Fun part is there is no GUI no intension of showing you the board");
 		System.out.println("From the given information how quickly can you find the destination ??");
 		System.out.println("NOTE:: Game is case insensitive so don't bother of pressing SHIFT key :P");
 		System.out.println("Feel free to send feedback @ mahesh.msg.24@gmail.com");
+		System.out.println("****************************************************************************");
 	}
 
 	/**
@@ -305,22 +311,27 @@ public class SourceToDestination {
 		System.out.println("You are currently at ("+current_point.x+", "+current_point.y+")");
 		for(int i=0 ; i<board_size ; ++i){
 			for(int j=0 ; j<board_size; ++j){
-		
-				switch(board[i][j]){
-				case EMPTY_POINT:
-					System.out.print("-");
-					break;
 				
-				case START_POINT:
-					System.out.print("S");
-					break;
+				if(current_point.x == i && current_point.y == j){
+					System.out.print("C");
 				
-				case END_POINT:
-					System.out.print("E");
-					break;
-				case WALL_POINT:
-					System.out.print("W");
-					break;
+				}else {		
+					switch(board[i][j]){
+					case EMPTY_POINT:
+						System.out.print("-");
+						break;
+					
+					case START_POINT:
+						System.out.print("S");
+						break;
+					
+					case END_POINT:
+						System.out.print("E");
+						break;
+					case WALL_POINT:
+						System.out.print("W");
+						break;
+					}
 				}
 				System.out.print(" ");
 			}
