@@ -1,4 +1,5 @@
 package mew.blindmaze.game;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,11 +8,16 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 
+/*
+ * 
+ * TODO: To Add the idea of tunnels which transport the user from one location to another.
+ */
 public class SourceToDestination {
 	public static int board[][];
 	public static int board_size=25;
 	public static int wall_count = 100;
-
+	public static int mine_count = 25;
+	
 	public static Point start_point;
 	public static Point end_point;
 	public static Point current_point;
@@ -70,6 +76,10 @@ public class SourceToDestination {
 		for(int i=0 ; i<wall_count ; ++i){
 			setPoint(Point_Type.WALL_POINT);
 		}
+		for(int i=0 ; i<mine_count ; ++i){
+			setPoint(Point_Type.MINE_POINT);
+		}
+		
 		current_point = start_point;
 	}
 
@@ -85,12 +95,22 @@ public class SourceToDestination {
 		boolean ret_value = false;
 
 		if(x >= 0 && x<board_size && y >= 0 && y<board_size){
-			ret_value = (board[x][y] == Point_Type.START_POINT ||
-							board[x][y] == Point_Type.END_POINT || 
-								board[x][y] == Point_Type.EMPTY_POINT);
+			ret_value = true;
 		}
 
 		if(debug_on) System.out.println("Point ("+x+", "+y+") is : "+ret_value);
+		return ret_value;
+	}
+	
+	private static boolean isSafe(int x, int y){
+		boolean ret_value = false;
+		
+		if(isValid(x, y)){
+			 ret_value = (board[x][y] == Point_Type.START_POINT ||
+				board[x][y] == Point_Type.END_POINT || 
+					board[x][y] == Point_Type.EMPTY_POINT);
+		}
+		
 		return ret_value;
 	}
 
@@ -102,22 +122,22 @@ public class SourceToDestination {
 		int y = curr.y;
 		List<Point> lst = new ArrayList<Point>();
 		// top
-		if(isValid(x-1, y)){
+		if(isSafe(x-1, y)){
 			lst.add(new Point(x-1, y));
 		}
 
 		//bottom
-		if(isValid(x+1, y)){
+		if(isSafe(x+1, y)){
 			lst.add(new Point(x+1, y));
 		}
 
 		//right
-		if(isValid(x, y+1)){
+		if(isSafe(x, y+1)){
 			lst.add(new Point(x, y+1));
 		}
 
 		//left
-		if(isValid(x, y-1)){
+		if(isSafe(x, y-1)){
 			lst.add(new Point(x, y-1));
 		}
 
@@ -128,9 +148,27 @@ public class SourceToDestination {
 	 * To check if its valid (x, y) on board and move and return whether move was successful
 	 */
 	private static boolean move(int x, int y){
-		if(isValid(x, y)){
+		if(isSafe(x, y)){
 			current_point = new Point(x, y);
 			return true;
+		}else if(isValid(x, y)){
+			if(isMine(x, y)){
+				print_lose("You Step on Mine. :D");
+				abort();
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private static void print_lose(String msg) {
+		System.out.println(msg);
+		System.out.println("You Lose !!! Game Over");
+	}
+
+	private static boolean isMine(int x, int y) {
+		if(isValid(x, y)){
+			return board[x][y] == Point_Type.MINE_POINT;
 		}
 		return false;
 	}
@@ -257,7 +295,8 @@ public class SourceToDestination {
 	private static void read_configuration() {
 		//TODO: Read Configuration from external file
 		wall_count = 100;
-		board_size = 25;		
+		board_size = 25;
+		mine_count = 25;
 	}
 
 	private static void abort() {
@@ -333,9 +372,9 @@ public class SourceToDestination {
 			for(int j=0 ; j<board_size; ++j){
 
 				if(current_point.x == i && current_point.y == j){
-					System.out.print("C");
+					ch = 'C';
 
-				}else {		
+				}else {
 					switch(board[i][j]){
 					case Point_Type.EMPTY_POINT:
 						ch = '-';
@@ -352,7 +391,10 @@ public class SourceToDestination {
 					case Point_Type.WALL_POINT:
 						ch = 'W';
 						break;
-					}
+					case Point_Type.MINE_POINT:
+						ch='M';
+						break;
+					}							
 				}
 				System.out.print(ch+" ");
 			}
